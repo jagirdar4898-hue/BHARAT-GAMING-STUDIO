@@ -2,68 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
     <title>Bharat Game Studio - Legend Racing</title>
-    </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
     <div id="splash-screen">
-        <h1>BHARAT GAME STUDIO</h1>
-        <p>Loading Legend Experience...</p>
-    </div>
-
-    <div id="garage-menu" style="display:none;">
-        <header>
-            <div id="coins-display">Coins: <span id="coin-count">0</span></div>
-            <h2>SELECT YOUR LEGEND CAR</h2>
-        </header>
-
-        <div class="car-viewer">
-            <div id="car-3d-display"></div>
-        </div>
-
-        <div class="car-selection-controls">
-            <button id="prev-car">Previous</button>
-            <div id="car-stats">
-                <h3 id="car-name">Legend Car 1 (Free)</h3>
-                <p>Speed: <span id="speed-stat">Fast</span></p>
-                <button id="unlock-btn">Select Car</button>
+        <div class="logo-container">
+            <img src="1.png" alt="Bharat Game Studio Logo" class="main-logo">
+            <h1 class="glow-text">BHARAT GAME STUDIO</h1>
+            <div class="loader-wrapper">
+                <div class="loader-bar"></div>
             </div>
-            <button id="next-car">Next</button>
+            <p>DRIVING THE FUTURE...</p>
         </div>
     </div>
 
-    <div id="map-selection" style="display:none;">
-        <h2>CHOOSE YOUR TRACK</h2>
-        <div class="map-grid">
-            <button class="map-card" data-map="legend-city">1. Extraordinary Legend City</button>
-            <button class="map-card" data-map="normal-city">2. Normal City</button>
-            <button class="map-card" data-map="village">3. Village (Gaav)</button>
-            <button class="map-card" data-map="desert">4. Desert Area</button>
-            <button class="map-card" data-map="snow-mountain">5. Snowy Mountain</button>
+    <div id="main-menu" style="display:none;">
+        <div class="top-bar">
+            <div class="coin-section">🪙 <span id="coin-count">0</span></div>
+            <img src="1.png" class="mini-logo">
         </div>
-    </div>
 
-    <div id="game-container" style="display:none;">
-        <canvas id="racing-canvas"></canvas>
-
-        <div class="game-ui">
-            <div class="speedometer">0 KM/H</div>
+        <div class="garage-display">
+            <div id="car-canvas-container"></div>
             
-            <button id="change-view">Change View (FPV/TPV)</button>
+            <div class="car-info">
+                <h2 id="car-name">CAR 1 (LEGEND STARTER)</h2>
+                <p id="car-price">STATUS: FREE</p>
+            </div>
+        </div>
 
-            <div class="controls-overlay">
-                <div class="left-controls">
-                    <button id="btn-horn">📯 HORN</button>
+        <div class="menu-controls">
+            <button class="nav-btn" onclick="changeCar(-1)">PREVIOUS</button>
+            <button id="action-btn" class="primary-btn" onclick="selectCar()">SELECT CAR</button>
+            <button class="nav-btn" onclick="changeCar(1)">NEXT</button>
+        </div>
+    </div>
+
+    <div id="map-menu" style="display:none;">
+        <div class="studio-header">
+            <img src="1.png" class="mini-logo">
+            <h2>SELECT YOUR TRACK</h2>
+        </div>
+        
+        <div class="map-grid">
+            <div class="map-card" onclick="startRace('legend-city')">
+                <div class="map-thumb city-1"></div>
+                <span>1. LEGEND CITY (EXTRAORDINARY)</span>
+            </div>
+            <div class="map-card" onclick="startRace('normal-city')">
+                <div class="map-thumb city-2"></div>
+                <span>2. NORMAL CITY</span>
+            </div>
+            <div class="map-card" onclick="startRace('village')">
+                <div class="map-thumb rural"></div>
+                <span>3. GAAV (RURAL)</span>
+            </div>
+            <div class="map-card" onclick="startRace('desert')">
+                <div class="map-thumb desert"></div>
+                <span>4. DESERT AREA</span>
+            </div>
+            <div class="map-card" onclick="startRace('snow-mountain')">
+                <div class="map-thumb snow"></div>
+                <span>5. SNOWY MOUNTAIN</span>
+            </div>
+        </div>
+        <button class="back-btn" onclick="backToGarage()">BACK TO GARAGE</button>
+    </div>
+
+    <div id="game-ui" style="display:none;">
+        <button id="view-toggle" class="game-btn" onclick="toggleCamera()">🎥 VIEW</button>
+
+        <div class="dashboard">
+            <div class="speed-box">
+                <span id="speed-num">0</span>
+                <small>KM/H</small>
+            </div>
+            <div class="gear-box">GEAR: <span id="gear-num">1</span></div>
+            <img src="1.png" class="game-logo-overlay">
+        </div>
+
+        <div class="controls-container">
+            <div class="left-controls">
+                <button id="horn-btn" class="control-icon">📯 HORN</button>
                 </div>
-                <div class="right-controls">
-                    <button id="btn-accel">GAS</button>
-                    <button id="btn-brake">BRAKE</button>
-                    <div id="gear-indicator">Gear: 1</div>
+            
+            <div class="right-controls">
+                <div class="pedal-group">
+                    <button id="brake-btn" class="pedal brake">BRAKE</button>
+                    <button id="accel-btn" class="pedal gas">GAS</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <script src="game.js"></script>
 </body>
-</html>
+                </html>
