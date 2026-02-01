@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bharat Game Studio - Legend Racing</title>
+    </head>
+<body>
+
+    <div id="splash-screen">
+        <h1>BHARAT GAME STUDIO</h1>
+        <p>Loading Legend Experience...</p>
+    </div>
+
+    <div id="garage-menu" style="display:none;">
+        <header>
+            <div id="coins-display">Coins: <span id="coin-count">0</span></div>
+            <h2>SELECT YOUR LEGEND CAR</h2>
+        </header>
+
+        <div class="car-viewer">
+            <div id="car-3d-display"></div>
+        </div>
+
+        <div class="car-selection-controls">
+            <button id="prev-car">Previous</button>
+            <div id="car-stats">
+                <h3 id="car-name">Legend Car 1 (Free)</h3>
+                <p>Speed: <span id="speed-stat">Fast</span></p>
+                <button id="unlock-btn">Select Car</button>
+            </div>
+            <button id="next-car">Next</button>
+        </div>
+    </div>
+
+    <div id="map-selection" style="display:none;">
+        <h2>CHOOSE YOUR TRACK</h2>
+        <div class="map-grid">
+            <button class="map-card" data-map="legend-city">1. Extraordinary Legend City</button>
+            <button class="map-card" data-map="normal-city">2. Normal City</button>
+            <button class="map-card" data-map="village">3. Village (Gaav)</button>
+            <button class="map-card" data-map="desert">4. Desert Area</button>
+            <button class="map-card" data-map="snow-mountain">5. Snowy Mountain</button>
+        </div>
+    </div>
+
+    <div id="game-container" style="display:none;">
+        <canvas id="racing-canvas"></canvas>
+
+        <div class="game-ui">
+            <div class="speedometer">0 KM/H</div>
+            
+            <button id="change-view">Change View (FPV/TPV)</button>
+
+            <div class="controls-overlay">
+                <div class="left-controls">
+                    <button id="btn-horn">📯 HORN</button>
+                </div>
+                <div class="right-controls">
+                    <button id="btn-accel">GAS</button>
+                    <button id="btn-brake">BRAKE</button>
+                    <div id="gear-indicator">Gear: 1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
