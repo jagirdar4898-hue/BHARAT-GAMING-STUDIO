@@ -1,9 +1,10 @@
-/* --- Global Reset & Mobile Optimization --- */
+/* --- BHARAT GAME STUDIO: MASTER CSS --- */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Isse buttons select nahi honge aur blue box nahi aayega */
+    /* Selection aur Blue highlight hatane ke liye */
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     user-select: none;
@@ -16,14 +17,14 @@ body, html {
     height: 100%;
     overflow: hidden;
     background-color: #000;
-    font-family: 'Arial Black', sans-serif;
-    position: fixed; /* Tab bar scroll hone se rokta hai */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    position: fixed; /* Scroll rokne ke liye */
 }
 
-/* --- Force Landscape Message --- */
+/* --- Orientation Lock Message --- */
 @media screen and (orientation: portrait) {
     body::before {
-        content: "🔄 ROTATE PHONE TO START RACE";
+        content: "🔄 ROTATE YOUR PHONE TO PLAY";
         position: fixed;
         inset: 0;
         background: #000;
@@ -32,34 +33,35 @@ body, html {
         align-items: center;
         justify-content: center;
         z-index: 10000;
-        font-size: 20px;
+        font-weight: bold;
+        font-size: 1.5rem;
         text-align: center;
     }
 }
 
-/* --- Splash Screen (BHARAT GAME STUDIO) --- */
+/* --- Splash Screen --- */
 #splash-screen {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle, #1a1a1a, #000);
+    background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
-    transition: opacity 0.8s ease;
+    z-index: 5000;
+    transition: opacity 1s ease;
 }
 
 .logo-container { text-align: center; }
 .main-logo {
-    width: 120px;
-    filter: drop-shadow(0 0 10px #ff0000);
-    animation: pulse 1.5s infinite ease-in-out;
+    width: 140px;
+    filter: drop-shadow(0 0 15px #ff0000);
+    animation: pulse 2s infinite;
 }
 .glow-text {
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: #fff;
     text-shadow: 0 0 20px #ff0000;
-    margin-top: 10px;
+    letter-spacing: 3px;
 }
 
 /* --- Menu & Garage --- */
@@ -68,86 +70,107 @@ body, html {
     width: 100%;
     height: 100%;
     z-index: 100;
-    background: rgba(0,0,0,0.7);
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9));
 }
 
 .top-bar {
     display: flex;
     justify-content: space-between;
-    padding: 10px 20px;
-    align-items: center;
+    padding: 15px 30px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.mini-logo { width: 45px; height: 45px; }
+.mini-logo { width: 50px; height: 50px; object-fit: contain; }
 
 #car-canvas-container {
-    width: 100vw;
-    height: 60vh;
+    width: 100%;
+    height: 65vh;
 }
+
+.car-info { text-align: center; margin-top: -20px; }
+#car-name { font-size: 1.8rem; color: #00ffcc; text-shadow: 0 0 10px #000; }
 
 .menu-controls {
     display: flex;
     justify-content: center;
     gap: 20px;
-    padding: 10px;
+    margin-top: 20px;
 }
 
 .primary-btn {
-    background: linear-gradient(to bottom, #ff0000, #900);
+    background: #ff0000;
     color: white;
-    padding: 15px 40px;
+    padding: 15px 45px;
     border: none;
     border-radius: 50px;
     font-weight: bold;
-    box-shadow: 0 0 15px #ff0000;
+    box-shadow: 0 0 20px #ff0000;
+    cursor: pointer;
 }
 
-/* --- Map Selection Grid --- */
+.nav-btn {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+/* --- Map Selection (Visible & Clear) --- */
 .map-grid {
-    display: flex;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 15px;
-    padding: 20px;
-    background: rgba(255,255,255,0.05);
+    padding: 30px;
+    margin-top: 50px;
 }
 
 .map-card {
-    background: #333; /* Thoda light gray */
-    border: 2px solid #ff0000;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid #333;
+    padding: 20px 10px;
+    border-radius: 12px;
+    text-align: center;
     color: white;
-    padding: 20px;
     font-weight: bold;
-    text-shadow: 0 0 5px #000;
-    box-shadow: 0 0 10px rgba(255,0,0,0.5);
+    transition: 0.3s;
 }
 
-/* --- Game UI (Pedals & Speedo) --- */
+.map-card:hover {
+    border-color: #00ffcc;
+    background: rgba(0, 255, 204, 0.2);
+    transform: translateY(-5px);
+}
+
+/* --- Gameplay UI --- */
 #game-ui {
     position: absolute;
     inset: 0;
-    pointer-events: none; /* Screen par touch allow karne ke liye */
+    pointer-events: none;
 }
 
 .dashboard {
     position: absolute;
     top: 5%;
-    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
+    pointer-events: none;
 }
 
 .speed-box {
-    font-size: 3.5rem;
-    color: #00ff00;
-    text-shadow: 0 0 10px #000;
+    font-size: 4rem;
     font-weight: 900;
+    color: #00ff00;
+    text-shadow: 2px 2px 5px #000;
 }
 
 .game-logo-overlay {
     position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 50px;
-    opacity: 0.5;
+    top: 15px;
+    right: 15px;
+    width: 60px;
+    opacity: 0.6;
 }
 
 .controls-container {
@@ -156,41 +179,36 @@ body, html {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0 5%;
-    pointer-events: none;
+    padding: 0 40px;
 }
 
 .left-controls, .right-controls { pointer-events: auto; }
 
 .pedal {
-    width: 80px;
-    height: 100px;
-    border-radius: 10px;
-    border: 3px solid rgba(255,255,255,0.3);
-    color: white;
+    width: 100px;
+    height: 130px;
+    border-radius: 15px;
+    border: 4px solid rgba(255,255,255,0.2);
     font-weight: bold;
-    font-size: 12px;
+    color: white;
+    font-size: 1.1rem;
 }
 
-.gas { background: rgba(0, 255, 0, 0.3); }
-.brake { background: rgba(255, 0, 0, 0.3); }
+.gas { background: rgba(0, 255, 0, 0.2); box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
+.brake { background: rgba(255, 0, 0, 0.2); box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
 
 .control-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
     background: rgba(255,255,255,0.1);
-    border: 1px solid white;
     color: white;
+    border: 1px solid white;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 1rem;
 }
 
-/* --- Animations --- */
+/* Animations */
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
-
-@keyframes load {
-    from { width: 0; }
-    to { width: 100%; }
-    }
