@@ -14,12 +14,12 @@ let trafficCars = [];
 const carPaths = [
     'car1.glb', 
     'car2.glb', 
-    'Car3/Car3.gltf', 
+    'Car3/car3.gltf', 
     'car4.glb', 
     'car5.glb'
 ];
 
-const carPrices = [0, 500, 1500, 3000, 7000];
+const carPrices = [0, 5000, 15000, 30000, 70000];
 
 // --- 1. Boot Sequence ---
 window.onload = () => {
