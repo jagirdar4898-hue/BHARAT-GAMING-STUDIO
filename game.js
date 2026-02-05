@@ -1,176 +1,112 @@
-// --- BHARAT GAME STUDIO: ULTIMATE LEGEND ENGINE ---
+// --- Additional Variables ---
+let isGameOver = false;
+let score = 0;
+let highScore = localStorage.getItem("highScore") || 0;
 
-let scene, camera, renderer, car;
-let currentCarIndex = localStorage.getItem('selectedCar') ? parseInt(localStorage.getItem('selectedCar')) : 0;
-let coins = 0, speed = 0, gear = 1, isRacing = false;
-let moveForward = false, moveBackward = false;
-let trafficCars = [];
-
-// GitHub Friendly Paths
-const carPaths = [
-    './car1.glb', 
-    './car2.glb', 
-    './Car3/car3.gltf', 
-    './car4.glb', 
-    './car5.glb'
-];
-
-// --- 1. Boot Logic ---
-window.onload = () => {
-    setTimeout(() => {
-        document.getElementById('splash-screen').style.display = 'none';
-        document.getElementById('main-menu').style.display = 'block';
-        initEngine();
-        updateMenuUI();
-    }, 3000);
-};
-
-// --- 2. 3D Engine Initialization ---
-function initEngine() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB); // Default Sky
-    scene.fog = new THREE.Fog(0x87CEEB, 10, 800);
-
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    
-    const container = document.getElementById('car-canvas-container');
-    container.innerHTML = ''; 
-    container.appendChild(renderer.domElement);
-
-    // High Quality Lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 1.8);
-    scene.add(ambient);
-    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
-    sun.position.set(0, 50, 20);
-    scene.add(sun);
-
-    camera.position.set(0, 3, 10);
-    loadCarModel(carPaths[currentCarIndex]);
-    gameLoop();
+// Collision Detection Function
+function checkCollision(pX, pY, pW, pH, tX, tY, tW, tH) {
+    return pX < tX + tW && pX + pW > tX && pY < tY + tH && pY + pH > tY;
 }
 
-// --- 3. Car Loading & Save System ---
-function loadCarModel(path) {
-    if(car) scene.remove(car);
-    const loader = new THREE.GLTFLoader();
-    loader.load(path, (gltf) => {
-        car = gltf.scene;
-        scene.add(car);
-    }, undefined, (err) => {
-        // Error par red box dikhega
-        const box = new THREE.Mesh(new THREE.BoxGeometry(2,1,4), new THREE.MeshBasicMaterial({color:0xff0000}));
-        car = box;
-        scene.add(car);
-    });
+// Reset Game Function
+function resetGame() {
+    speed = 0;
+    score = 0;
+    trafficCars = [];
+    isGameOver = false;
+    isInteriorView = false;
 }
 
-function updateMenuUI() {
-    document.getElementById('car-name').innerText = `CAR ${currentCarIndex + 1}`;
-    localStorage.setItem('selectedCar', currentCarIndex); // Permanent Save
-    loadCarModel(carPaths[currentCarIndex]);
-}
-
-window.changeCar = (dir) => {
-    currentCarIndex = (currentCarIndex + dir + carPaths.length) % carPaths.length;
-    updateMenuUI();
-};
-
-// --- 4. Map & Traffic Logic ---
-window.startRace = (mapType) => {
-    document.getElementById('map-menu').style.display = 'none';
-    document.getElementById('game-ui').style.display = 'block';
-    isRacing = true;
-    setupEnvironment(mapType);
-    for(let i=0; i<40; i++) createTraffic(); // Extra Traffic
-};
-
-function setupEnvironment(type) {
-    // Road Plane
-    const road = new THREE.Mesh(
-        new THREE.PlaneGeometry(30, 20000),
-        new THREE.MeshStandardMaterial({color: 0x222222})
-    );
-    road.rotation.x = -Math.PI / 2;
-    scene.add(road);
-
-    // Map Specific Backgrounds
-    const colors = {
-        'legend-city': 0x0a0a1a,
-        'village': 0x44aa44,
-        'desert': 0xd2b48c,
-        'snow-mountain': 0xffffff
-    };
-    const c = colors[type] || 0x87CEEB;
-    scene.background = new THREE.Color(c);
-    scene.fog.color.set(c);
-}
-
-function createTraffic() {
-    const tGeo = new THREE.BoxGeometry(2.5, 1.5, 5);
-    const tMat = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('1.png') });
-    let tCar = new THREE.Mesh(tGeo, tMat);
-    const lanes = [-8, -3, 3, 8];
-    tCar.position.set(lanes[Math.floor(Math.random()*lanes.length)], 0.75, -Math.random()*2000);
-    scene.add(tCar);
-    trafficCars.push(tCar);
-}
-
-// --- 5. Gameplay & Camera Views ---
-window.toggleCamera = () => {
-    // Switch between TPV and FPV
-    if(camera.position.z > 5) {
-        camera.position.set(0, 1, 0.5); // Inside View
-    } else {
-        camera.position.set(0, 3, 10); // Outside View
-    }
-};
-
-function playHorn() {
-    const audio = new Audio('https://www.myinstants.com/media/sounds/car-horn-01.mp3');
-    audio.play();
-}
-
-// --- 6. Physics & Collision (Out System) ---
-function gameLoop() {
-    requestAnimationFrame(gameLoop);
-    if (isRacing && car) {
-        // Acceleration
-        if (moveForward) speed += 0.5; else speed *= 0.98;
-        car.position.z -= speed / 60;
+// --- Main Draw Loop (Updated) ---
+function draw() {
+    if (isGameOver) {
+        // Game Over Screen with Red Glow
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Camera Follow
-        camera.position.z = car.position.z + (camera.position.z > car.position.z + 5 ? 10 : 0.5);
-        camera.position.x = car.position.x;
-        camera.lookAt(car.position.x, 1, car.position.z - 15);
-
-        // Traffic & Collision
-        trafficCars.forEach(t => {
-            t.position.z += 0.5; // Traffic moving
-            if(car.position.distanceTo(t.position) < 3.8) {
-                alert("CRASHED! BHARAT GAME STUDIO");
-                location.reload(); // Out Logic
-            }
-            if(t.position.z > car.position.z + 20) t.position.z -= 2000;
-        });
-
-        // UI Dashboard
-        document.getElementById('speed-num').innerText = Math.floor(speed);
-        gear = speed > 18000 ? 5 : speed > 18000 ? 3 : 1;
-        document.getElementById('gear-num').innerText = gear;
-    } else if(car) {
-        car.rotation.y += 0.01; // Garage Spin
+        ctx.font = "bold 60px Russo One";
+        ctx.fillStyle = "#ff0000";
+        ctx.textAlign = "center";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "red";
+        ctx.fillText("CRASHED!", canvas.width / 2, canvas.height / 2 - 50);
+        
+        ctx.font = "20px Orbitron";
+        ctx.fillStyle = "white";
+        ctx.fillText("FINAL SPEED: " + Math.floor(speed) + " KM/H", canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText("HIGH SCORE: " + Math.floor(highScore), canvas.width / 2, canvas.height / 2 + 60);
+        ctx.fillText("TOUCH TO RESTART", canvas.width / 2, canvas.height / 2 + 120);
+        
+        return; 
     }
-    renderer.render(scene, camera);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Calculate Speed & Score
+    if (isGas && speed < MAX_SPEED) speed += 4;
+    else if (isBrake && speed > 0) speed -= 10;
+    else if (speed > 0) speed -= 1.5;
+
+    if (speed > 10) score += speed / 100; // Speed jitni zyada, score utna tez badhega
+    speedElement.innerText = Math.floor(speed);
+
+    // 2. Road Animation
+    roadY += speed * 0.1;
+    if (roadY >= canvas.height) roadY = 0;
+    ctx.drawImage(img.road, 0, roadY - canvas.height, canvas.width, canvas.height);
+    ctx.drawImage(img.road, 0, roadY, canvas.width, canvas.height);
+
+    // 3. Traffic & Collision
+    let playerX = canvas.width / 2 - 50;
+    let playerY = canvas.height - 250;
+    let playerW = 100;
+    let playerH = 200;
+
+    trafficCars.forEach((c, index) => {
+        let relativeSpeed = (speed - TRAFFIC_BASE_SPEED) * 0.1;
+        c.y += relativeSpeed + 3; 
+        ctx.drawImage(img[c.type], c.x, c.y, 80, 160);
+
+        // Check for Crash
+        if (checkCollision(playerX, playerY, playerW, playerH, c.x, c.y, 80, 160)) {
+            isGameOver = true;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem("highScore", highScore);
+            }
+        }
+
+        if (c.y > canvas.height + 500 || c.y < -1000) trafficCars.splice(index, 1);
+    });
+    spawnTraffic();
+
+    // 4. Draw Player View
+    if (!isInteriorView) {
+        ctx.drawImage(img.playerOut, playerX, playerY, playerW, playerH);
+    } else {
+        // Interior Graphics
+        ctx.drawImage(img.playerIn, 0, 0, canvas.width, canvas.height);
+        
+        // Branding on Dashboard
+        ctx.font = "italic bold 22px Orbitron";
+        ctx.fillStyle = "white";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "red";
+        ctx.fillText("BHARAT GAMING STUDIO", canvas.width / 2, canvas.height - 140);
+        
+        // Logo placements
+        ctx.drawImage(img.logo, canvas.width / 2 - 35, canvas.height - 120, 70, 70); 
+        ctx.globalAlpha = 0.6; // Mirror reflection effect
+        ctx.drawImage(img.logo, 40, 60, 90, 45); 
+        ctx.drawImage(img.logo, canvas.width - 130, 60, 90, 45);
+        ctx.globalAlpha = 1.0;
+        ctx.shadowBlur = 0;
+    }
+
+    requestAnimationFrame(draw);
 }
 
-// Mobile Controls Fix
-const btnGas = document.getElementById('accel-btn');
-const btnBrake = document.getElementById('brake-btn');
-
-btnGas.onpointerdown = (e) => { e.preventDefault(); moveForward = true; };
-btnGas.onpointerup = () => moveForward = false;
-btnBrake.onpointerdown = (e) => { e.preventDefault(); moveBackward = true; };
-btnBrake.onpointerup = () => moveBackward = false;
+// Restart event
+canvas.addEventListener('touchstart', () => {
+    if (isGameOver) resetGame();
+});
