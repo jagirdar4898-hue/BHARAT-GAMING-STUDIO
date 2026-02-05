@@ -102,6 +102,74 @@ function draw() {
         ctx.globalAlpha = 1.0;
         ctx.shadowBlur = 0;
     }
+    // 1. Camera Shake aur Blur Logic
+function applyEffects() {
+    const gameScreen = document.getElementById('gameCanvas');
+    
+    // Agar speed 600 se upar hai toh blur aur shake shuru karo
+    if (speed > 600) {
+        gameScreen.classList.add('fast-blur');
+        if (speed > 750) {
+            gameScreen.classList.add('screen-shake');
+        }
+    } else {
+        gameScreen.classList.remove('fast-blur');
+        gameScreen.classList.remove('screen-shake');
+    }
+}
+
+// 2. Exhaust Flames (Aag) Logic
+function drawFlames(x, y, w, h) {
+    if (isGas && speed > 100) {
+        ctx.fillStyle = Math.random() > 0.5 ? "orange" : "red";
+        // Do silencers se aag nikalegi
+        ctx.beginPath();
+        ctx.arc(x + 20, y + h + (Math.random() * 20), 10, 0, Math.PI * 2); // Left
+        ctx.arc(x + w - 20, y + h + (Math.random() * 20), 10, 0, Math.PI * 2); // Right
+        ctx.fill();
+        
+        // Glow effect for fire
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "yellow";
+    }
+}
+
+// 3. Steering Rotation Logic
+let targetRotation = 0;
+let currentRotation = 0;
+
+function updateSteering() {
+    const wheelImg = document.getElementById('steering-wheel');
+    
+    // Move touch detection ke hisaab se rotation set karein
+    if (isSteeringLeft) targetRotation = -45;
+    else if (isSteeringRight) targetRotation = 45;
+    else targetRotation = 0;
+
+    // Smooth transition
+    currentRotation += (targetRotation - currentRotation) * 0.1;
+    wheelImg.style.transform = `rotate(${currentRotation}deg)`;
+}
+
+// --- draw() function ke andar inka use karein ---
+function draw() {
+    // ... puraana drawing code ...
+
+    applyEffects(); // Shake aur Blur apply karein
+    updateSteering(); // Steering ghumayein
+
+    if (!isInteriorView) {
+        // Exterior view mein car ke piche aag
+        drawFlames(playerX, playerY, playerW, playerH);
+        ctx.drawImage(img.playerOut, playerX, playerY, playerW, playerH);
+    } else {
+        // Interior view mein dashboard
+        ctx.drawImage(img.playerIn, 0, 0, canvas.width, canvas.height);
+        // BHARAT GAMING STUDIO text par .brand-pulse class check karein
+    }
+
+    requestAnimationFrame(draw);
+}
 
     requestAnimationFrame(draw);
 }
