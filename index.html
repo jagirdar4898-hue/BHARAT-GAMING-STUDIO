@@ -3,78 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bharat Gaming Studio - Racing</title>
-    <style>
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background: #000; font-family: 'Arial', sans-serif;
-            user-select: none; /* Text select nahi hoga */
-            -webkit-user-select: none;
-        }
-
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed; width: 100%; height: 100%; background: #111;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100; color: gold;
-        }
-        .studio-name { font-size: 32px; font-weight: bold; letter-spacing: 2px; text-shadow: 2px 2px #f00; }
-        .logo-img { width: 100px; margin: 20px; border-radius: 50%; }
-
-        /* Game Container */
-        #game-container { position: relative; width: 100vw; height: 100vh; display: none; }
-        canvas { width: 100%; height: 100%; display: block; }
-
-        /* UI Elements */
-        .camera-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; }
-        
-        #controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; }
-        .steering-wheel { width: 150px; height: 150px; transition: transform 0.1s; }
-        .pedals { display: flex; gap: 20px; }
-        .pedal { width: 80px; height: 120px; border-radius: 10px; border: 3px solid #fff; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-        /* Styling for BHARAT GAMING STUDIO */
-        .brand-overlay { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: cyan; font-style: italic; font-weight: bold; }
-    </style>
+    <title>BHARAT GAMING STUDIO | LEGEND RACER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="loading-screen">
-        <img src="b.png" alt="Logo" class="logo-img">
-        <div class="studio-name">BHARAT GAMING STUDIO</div>
-        <p>LOADING...</p>
+        <div class="logo-box">
+            <img src="b.png" alt="Logo" class="loading-logo">
+        </div>
+        <h1 class="legendary-text">BHARAT GAMING STUDIO</h1>
+        <div class="loader-bar">
+            <div class="progress"></div>
+        </div>
+        <p class="loading-subtext">INITIALIZING 800 KM/H ENGINE...</p>
     </div>
 
     <div id="game-container">
-        <div class="brand-overlay">BHARAT GAMING STUDIO</div>
-        <div class="camera-btn" onclick="toggleCamera()">🤖</div>
+        <div class="top-branding">BHARAT GAMING STUDIO</div>
+        
+        <div class="camera-switch" id="cam-btn" onclick="toggleCamera()">🤖</div>
         
         <canvas id="gameCanvas"></canvas>
 
-        <div id="controls">
-            <img src="steering.png" id="steering" class="steering-wheel">
+        <div class="speed-display">
+            <span id="current-speed">0</span> <small>KM/H</small>
+        </div>
+
+        <div id="ui-controls">
+            <div class="steering-section">
+                <div class="label-glow">BHARAT GAMING STUDIO</div>
+                <img src="steering.png" id="steering-wheel" class="legend-steering">
+                <img src="b.png" class="mini-logo-steering">
+            </div>
             
-            <div class="pedals">
-                <div class="pedal" id="brake-btn" style="border-color: #ff4444;">BRAKE</div>
-                <div class="pedal" id="gas-btn" style="border-color: #44ff44;">GAS</div>
+            <div class="pedal-section">
+                <div class="pedal brake" id="brake-btn">STOP</div>
+                <div class="pedal gas" id="gas-btn">RACE</div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Loading Logic
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-                // Initialize Game Here
-            }, 3000); // 3 second loading
-        };
-
-        function toggleCamera() {
-            console.log("Camera View Changed");
-            // Camera switching logic will go here
-        }
-    </script>
+    <script src="game.js"></script>
 </body>
-</html>
+    </html>
