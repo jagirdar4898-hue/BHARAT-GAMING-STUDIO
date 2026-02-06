@@ -22,13 +22,27 @@ let loadedImages = 0;
 let gameStarted = false;
 const totalImages = Object.keys(sources).length;
 
-// --- 2. Final Loading Logic (Pakka Ilaaj) ---
-function checkLoad() {
-    loadedImages++;
-    console.log("Progress: " + loadedImages + "/" + totalImages);
-    if (loadedImages >= totalImages && !gameStarted) {
-        startGame();
-    }
+// Sabse pehle images ko initialize karo
+for (let key in sources) {
+    img[key] = new Image();
+    img[key].src = sources[key];
+    
+    img[key].onload = () => {
+        loadedImages++;
+        if (loadedImages >= totalImages && !gameStarted) {
+            startGame();
+        }
+    };
+
+    img[key].onerror = () => {
+        console.error("Missing: " + sources[key]);
+        // Agar image nahi mili toh uski jagah ek colored box load kar do taaki black screen na aaye
+        img[key].src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+        loadedImages++;
+        if (loadedImages >= totalImages && !gameStarted) {
+            startGame();
+        }
+    };
 }
 
 function startGame() {
@@ -36,29 +50,16 @@ function startGame() {
         gameStarted = true;
         const loadingScreen = document.getElementById('loading-screen');
         if(loadingScreen) loadingScreen.style.display = 'none';
-        draw(); 
+        requestAnimationFrame(draw); 
     }
 }
 
-// Image Loading Loop
-for (let key in sources) {
-    img[key] = new Image();
-    img[key].src = sources[key];
-    img[key].onload = checkLoad;
-    img[key].onerror = function() {
-        console.error("Missing asset: " + sources[key]);
-        // Error hone par bhi count badhao taaki game ruke nahi
-        checkLoad(); 
-    };
-}
-
-// 4-Second Fail-Safe: Agar internet slow ho ya image na mile, toh dhakka maar ke start karo
+// Mobile ke liye 5 second ka wait (kabhi kabhi images slow load hoti hain)
 setTimeout(() => {
     if (!gameStarted) {
-        console.warn("Forcing start after timeout...");
         startGame();
     }
-}, 4000);
+}, 5000);
 
 // --- 3. Additional Variables & Game Logic ---
 let isGameOver = false;
@@ -81,6 +82,7 @@ function resetGame() {
 
 function applyEffects() {
     const gameScreen = document.getElementById('gameCanvas');
+    if (!gameScreen) return;
     if (speed > 600) {
         gameScreen.classList.add('fast-blur');
         if (speed > 750) gameScreen.classList.add('screen-shake');
@@ -121,12 +123,9 @@ function draw() {
         ctx.font = "bold 60px Russo One";
         ctx.fillStyle = "#ff0000";
         ctx.textAlign = "center";
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = "red";
         ctx.fillText("CRASHED!", canvas.width / 2, canvas.height / 2 - 50);
         ctx.font = "20px Orbitron";
         ctx.fillStyle = "white";
-        ctx.shadowBlur = 0;
         ctx.fillText("FINAL SPEED: " + Math.floor(speed) + " KM/H", canvas.width / 2, canvas.height / 2 + 20);
         ctx.fillText("HIGH SCORE: " + Math.floor(highScore), canvas.width / 2, canvas.height / 2 + 60);
         ctx.fillText("TOUCH TO RESTART", canvas.width / 2, canvas.height / 2 + 120);
@@ -140,12 +139,18 @@ function draw() {
     else if (speed > 0) speed -= 1.5;
 
     if (speed > 10) score += speed / 100;
-    if (typeof speedElement !== 'undefined') speedElement.innerText = Math.floor(speed);
+    if (document.getElementById('speed')) {
+        document.getElementById('speed').innerText = Math.floor(speed);
+    }
 
     roadY += speed * 0.1;
     if (roadY >= canvas.height) roadY = 0;
-    ctx.drawImage(img.road, 0, roadY - canvas.height, canvas.width, canvas.height);
-    ctx.drawImage(img.road, 0, roadY, canvas.width, canvas.height);
+    
+    // Draw Road
+    if (img.road) {
+        ctx.drawImage(img.road, 0, roadY - canvas.height, canvas.width, canvas.height);
+        ctx.drawImage(img.road, 0, roadY, canvas.width, canvas.height);
+    }
 
     applyEffects();
     updateSteering();
@@ -169,26 +174,27 @@ function draw() {
         }
         if (c.y > canvas.height + 500 || c.y < -1000) trafficCars.splice(index, 1);
     });
+    
     if (typeof spawnTraffic === 'function') spawnTraffic();
 
     if (!isInteriorView) {
         drawFlames(playerX, playerY, playerW, playerH);
-        ctx.drawImage(img.playerOut, playerX, playerY, playerW, playerH);
+        if (img.playerOut) ctx.drawImage(img.playerOut, playerX, playerY, playerW, playerH);
     } else {
-        ctx.drawImage(img.playerIn, 0, 0, canvas.width, canvas.height);
+        if (img.playerIn) ctx.drawImage(img.playerIn, 0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.font = "italic bold 22px Orbitron";
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "red";
         ctx.fillText("BHARAT GAMING STUDIO", canvas.width / 2, canvas.height - 140);
         ctx.restore();
-        ctx.drawImage(img.logo, canvas.width / 2 - 35, canvas.height - 120, 70, 70); 
-        ctx.globalAlpha = 0.6;
-        ctx.drawImage(img.logo, 40, 60, 90, 45); 
-        ctx.drawImage(img.logo, canvas.width - 130, 60, 90, 45);
-        ctx.globalAlpha = 1.0;
+        if (img.logo) {
+            ctx.drawImage(img.logo, canvas.width / 2 - 35, canvas.height - 120, 70, 70); 
+            ctx.globalAlpha = 0.6;
+            ctx.drawImage(img.logo, 40, 60, 90, 45); 
+            ctx.drawImage(img.logo, canvas.width - 130, 60, 90, 45);
+            ctx.globalAlpha = 1.0;
+        }
     }
 
     requestAnimationFrame(draw);
